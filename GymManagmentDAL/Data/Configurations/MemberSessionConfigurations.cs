@@ -1,0 +1,24 @@
+﻿using GymManagmentDAL.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GymManagmentDAL.Data.Configurations
+{
+    internal class MemberSessionConfigurations : IEntityTypeConfiguration<MemberSession>
+    {
+        public void Configure(EntityTypeBuilder<MemberSession> builder)
+        {
+            builder.Property(X => X.CreatedAt)
+                .HasColumnName("BookingDate")
+                .HasDefaultValue("GETDATE()");
+
+            builder.HasKey(X => new { X.SessionId, X.MemberId });
+            builder.Ignore(X => X.id);
+        }
+    }
+}

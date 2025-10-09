@@ -20,7 +20,12 @@ namespace GymManagmentDAL.Data.Configurations
                 Tb.HasCheckConstraint("EndDateConstraint", "EndDate > StartDate");
             }
 
-            ); 
+            
+
+            );
+            builder.HasOne(T => T.Trainer).
+                WithMany(X => X.Sessions)
+                .HasForeignKey(X => X.TrainerId);
         }
     }
 }

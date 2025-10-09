@@ -12,5 +12,7 @@ namespace GymManagmentDAL.Entities
         //hiredate =>created at
 
         public speciality Speciality { get; set; }
+
+        public ICollection<session> Sessions { get; set; }
     }
 }

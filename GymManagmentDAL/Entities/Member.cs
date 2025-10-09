@@ -11,5 +11,16 @@ namespace GymManagmentDAL.Entities
         //join date hya hya created at
 
         public string photo { get; set; }
+
+
+        #region RelationShips
+        public HealthRecord HealthRecord { get; set; }
+
+        public ICollection<MemberShip> Memberships { get; set; }
+
+        public ICollection<session> Sessions { get; set; }
+
+        #endregion
+
     }
 }
