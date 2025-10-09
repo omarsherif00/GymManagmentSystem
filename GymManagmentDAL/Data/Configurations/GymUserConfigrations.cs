@@ -30,9 +30,12 @@ namespace GymManagmentDAL.Data.Configurations
 
             builder.HasIndex(X => X.Phone).IsUnique();
 
-            builder.OwnsOne(X => X.Address, AddressBuilder => { 
-            AddressBuilder.Property(A=>A.)
-            })
+            builder.OwnsOne(X => X.Address, AddressBuilder =>
+            {
+                AddressBuilder.Property(A => A.Street).HasColumnType("varchar(30)");
+
+                AddressBuilder.Property(A => A.City).HasColumnType("varchar(30)");
+            });
         }
     }
 }
