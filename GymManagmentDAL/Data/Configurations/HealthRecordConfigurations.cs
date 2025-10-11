@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Data.Configurations
 {
-    internal class HealthConfigurations : IEntityTypeConfiguration<HealthRecord>
+    internal class HealthRecordConfigurations : IEntityTypeConfiguration<HealthRecord>
     {
         public void Configure(EntityTypeBuilder<HealthRecord> builder)
         {
-            builder.ToTable("Member").HasKey(X => X.id);
+            builder.ToTable("Members").HasKey(X => X.id);
 
             builder.HasOne<Member>().WithOne(X => X.HealthRecord).HasForeignKey<HealthRecord>(X=>X.id);
 
-
+            builder.Ignore(X => X.CreatedAt);
         }
     }
 }

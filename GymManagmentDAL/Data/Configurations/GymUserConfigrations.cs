@@ -18,14 +18,14 @@ namespace GymManagmentDAL.Data.Configurations
             builder.Property(X => X.Email)
                 .HasColumnType("varchar(100)");
 
-            builder.ToTable(tb => tb.HasCheckConstraint("EmailValidFormatConstraint", "Email like '_%@_%._%"));
+            builder.ToTable(tb => tb.HasCheckConstraint("EmailValidFormatConstraint", "Email like '_%@_%._%'"));
 
             builder.HasIndex(X=>X.Email).IsUnique();
 
             builder.Property(X => X.Phone)
              .HasColumnType("varchar(11)");
 
-            builder.ToTable(Tb => Tb.HasCheckConstraint("phoneValidEgp", "Phone like '01' and phone not like %[0-9]%"));
+            builder.ToTable(Tb => Tb.HasCheckConstraint("phoneValidEgp", "Phone like '01' and phone not like '%[0-9]%'"));
 
 
             builder.HasIndex(X => X.Phone).IsUnique();
