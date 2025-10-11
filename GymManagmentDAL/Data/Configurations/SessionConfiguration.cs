@@ -1,0 +1,31 @@
+﻿using GymManagmentDAL.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GymManagmentDAL.Data.Configurations
+{
+    internal class SessionConfiguration : IEntityTypeConfiguration<session>
+    {
+        public void Configure(EntityTypeBuilder<session> builder)
+        {
+            builder.ToTable(Tb =>
+            {
+                Tb.HasCheckConstraint("CapacityConstarint", "Capacity between 1 and 25");
+                Tb.HasCheckConstraint("EndDateConstraint", "EndDate > StartDate");
+            }
+
+            
+
+            );
+            builder.HasOne(T => T.Trainer).
+                WithMany(X => X.Sessions)
+                .HasForeignKey(X => X.TrainerId);
+        }
+    }
+}
