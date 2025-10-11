@@ -11,22 +11,14 @@ namespace GymManagmentDAL.Repositries.Implementation
 {
     internal class PlanRepositry:IPlanRepositries
     {
-        private GymDbContext _dbContext=new GymDbContext();
+        private readonly GymDbContext _dbContext;
 
-        public int Add(Plan plan)
+        //private GymDbContext _dbContext=new GymDbContext();
+        public PlanRepositry(GymDbContext dbContext)
         {
-            _dbContext.Plans.Add(plan);
-            return _dbContext.SaveChanges();
+            _dbContext = dbContext;
         }
-
-        public int Delete(int id)
-        {
-            var plan=_dbContext.Plans.Find(id);
-            if(plan is null)
-                return 0;
-            _dbContext.Plans.Remove(plan);
-            return _dbContext.SaveChanges();
-        }
+     
 
         public Plan? Get(int id)=>  _dbContext.Plans.Find(id);
 
