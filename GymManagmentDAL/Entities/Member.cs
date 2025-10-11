@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Entities
 {
-    internal class Member:GymUser
+    public class Member:GymUser
     {
         //join date hya hya created at
 

@@ -11,8 +11,13 @@ namespace GymManagmentDAL.Repositries.Implementation
 {
     internal class TrainerRepositry:ITrainerRepositry
     {
-        private readonly GymDbContext _dbContext = new GymDbContext();
+        private readonly GymDbContext _dbContext;
 
+        // private readonly GymDbContext _dbContext = new GymDbContext();
+        public TrainerRepositry(GymDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
         public int Add(Trainer trainer)
         {
             _dbContext.Trainer.Add(trainer);
