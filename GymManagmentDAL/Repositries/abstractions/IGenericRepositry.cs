@@ -9,7 +9,7 @@ namespace GymManagmentDAL.Repositries.abstractions
 {
     public interface IGenericRepositry<TEntity> where TEntity:BaseEntity,new()
     {
-       IEnumerable<TEntity> GetAll();
+       IEnumerable<TEntity> GetAll(Func<TEntity,bool>? condition);
        TEntity? GetById(int id);
        int Add(TEntity entity);
        int Update(TEntity entity);

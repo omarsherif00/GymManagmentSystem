@@ -1,6 +1,7 @@
 ﻿using GymManagmentDAL.Data.Contexts;
 using GymManagmentDAL.Entities;
 using GymManagmentDAL.Repositries.abstractions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,13 @@ namespace GymManagmentDAL.Repositries.Implementation
             return _dbContext.SaveChanges();
         }
 
-        public IEnumerable<TEntity> GetAll() => _dbContext.Set<TEntity>().ToList();
+        public IEnumerable<TEntity> GetAll(Func<TEntity, bool>? condition)
+        {
+            if (condition is null)
+                return _dbContext.Set<TEntity>().ToList();
+            else
+                return _dbContext.Set<TEntity>().AsNoTracking().Where(condition).ToList();
+        }
 
         public TEntity? GetById(int id) => _dbContext.Set<TEntity>().Find(id);
 
