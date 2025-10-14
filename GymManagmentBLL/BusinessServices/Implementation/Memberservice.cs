@@ -45,12 +45,12 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
             var memberViewModel = members.Select(M => new MemberViewModel
             {
-                Id = M.id,
+                     Id = M.id,
                      Name = M.Name,
-                       Phone = M.Phone,
-                        Photo = M.photo,
-                       Email = M.Email,
-                        Gender = M.Gender.ToString(),
+                     Phone = M.Phone,
+                     Photo = M.photo,
+                     Email = M.Email,
+                     Gender = M.Gender.ToString(),
 
             });
             return memberViewModel;
