@@ -1,4 +1,7 @@
 using GymManagmentDAL.Data.Contexts;
+using GymManagmentDAL.Entities;
+using GymManagmentDAL.Repositries.abstractions;
+using GymManagmentDAL.Repositries.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -22,7 +25,7 @@ namespace GymManagmentPL
                 );
 
 
-
+            builder.Services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositry<>));
 
             var app = builder.Build();
 
