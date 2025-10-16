@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Repositries.abstractions
 {
-    internal interface IPlanRepositries
+    public interface IPlanRepositries
     {
         IEnumerable<Plan> GetAllPlans(Plan plan);
         int Update(Plan plan);
-        Plan? Get(int id);
+        Plan? GetById(int id);
 
     }
 }

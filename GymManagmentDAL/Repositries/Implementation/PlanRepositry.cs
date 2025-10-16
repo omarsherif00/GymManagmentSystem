@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Repositries.Implementation
 {
-    internal class PlanRepositry:IPlanRepositries
+    public class PlanRepositry:IPlanRepositries
     {
         private readonly GymDbContext _dbContext;
 
@@ -20,7 +20,7 @@ namespace GymManagmentDAL.Repositries.Implementation
         }
      
 
-        public Plan? Get(int id)=>  _dbContext.Plans.Find(id);
+        public Plan? GetById(int id)=>  _dbContext.Plans.Find(id);
 
 
 

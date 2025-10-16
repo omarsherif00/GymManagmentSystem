@@ -26,6 +26,7 @@ namespace GymManagmentPL
 
 
             builder.Services.AddScoped(typeof(IGenericRepositry<>), typeof(GenericRepositry<>));
+            builder.Services.AddScoped(typeof(IPlanRepositries), typeof(PlanRepositry));
 
             var app = builder.Build();
 

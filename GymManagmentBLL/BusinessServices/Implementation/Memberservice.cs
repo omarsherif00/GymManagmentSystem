@@ -13,17 +13,21 @@ namespace GymManagmentBLL.BusinessServices.Implementation
     internal class Memberservice : IMemberServices
     {
         private readonly IGenericRepositry<Member> _memberRepositry;
+        private readonly IPlanRepositries _planRepositries;
+        private readonly IGenericRepositry<MemberShip> _memberShipRepositry;
 
-        public Memberservice(IGenericRepositry<Member> memberRepositry)
+        public Memberservice(IGenericRepositry<Member> memberRepositry, IGenericRepositry<MemberShip> memberShipRepositry,IPlanRepositries planRepositries)
         {
             _memberRepositry = memberRepositry;
+            _planRepositries = planRepositries;
+            _memberShipRepositry = memberShipRepositry;
         }
 
         public bool CreateMember(CreateMemberViewModel createMember)
         {
             //Email not exist
-            var EmailExist = _memberRepositry.GetAll(X=>X.Email==createMember.Email).Any();
-            if(EmailExist)
+            var EmailExist = _memberRepositry.GetAll(X => X.Email == createMember.Email).Any();
+            if (EmailExist)
                 return false;
             #region first way
             //if (members.Any())
@@ -40,7 +44,7 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
 
             //phone not exist
-            var PhoneExist=_memberRepositry.GetAll(X=>X.Phone==createMember.Phone).Any();
+            var PhoneExist = _memberRepositry.GetAll(X => X.Phone == createMember.Phone).Any();
             if (PhoneExist) return false;
 
             //CreateMemberViewModel=>Member
@@ -58,18 +62,18 @@ namespace GymManagmentBLL.BusinessServices.Implementation
                     Street = createMember.Street,
 
                 },
-                HealthRecord=new HealthRecord
+                HealthRecord = new HealthRecord
                 {
-                    height=createMember.HealthRecord.Height,
-                    weight=createMember.HealthRecord.Weight,
-                    Bloodtype=createMember.HealthRecord.BloodType,
-                    note=createMember.HealthRecord.note
+                    height = createMember.HealthRecord.Height,
+                    weight = createMember.HealthRecord.Weight,
+                    Bloodtype = createMember.HealthRecord.BloodType,
+                    note = createMember.HealthRecord.note
                 }
-                
+
 
             };
             //Create Member in database
-            return _memberRepositry.Add(member)>0;
+            return _memberRepositry.Add(member) > 0;
 
 
 
@@ -77,8 +81,8 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
         public IEnumerable<MemberViewModel> GetAllMembers()
         {
-            var members = _memberRepositry.GetAll();
-            if(members == null || !members.Any())
+            var members = _memberRepositry.GetAll(null);
+            if (members == null || !members.Any())
                 return [];
 
 
@@ -102,16 +106,49 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
             var memberViewModel = members.Select(M => new MemberViewModel
             {
-                     Id = M.id,
-                     Name = M.Name,
-                     Phone = M.Phone,
-                     Photo = M.photo,
-                     Email = M.Email,
-                     Gender = M.Gender.ToString(),
+                Id = M.id,
+                Name = M.Name,
+                Phone = M.Phone,
+                Photo = M.photo,
+                Email = M.Email,
+                Gender = M.Gender.ToString(),
 
             });
             return memberViewModel;
 
+        }
+
+        public MemberViewModel? GetMemberDetails(int memberid)
+        {
+            var member = _memberRepositry.GetById(memberid);
+            if (member == null) return null;
+
+            var MemberViewModel = new MemberViewModel
+            {
+                Name = member.Name,
+                Phone = member.Phone,
+                Email = member.Email,
+                Gender = member.Gender.ToString(),
+                DateOfBirth = member.DateOfBirth.ToShortDateString(),
+                Address = $"{member.Address.BuildingNumber}-{member.Address.Street}-{member.Address.City}",
+                Photo = member.photo,
+                
+
+
+            };
+            //active membership
+            var membership=_memberShipRepositry.GetAll(X=>X.MemberId==memberid && X.Status=="Active").FirstOrDefault();
+
+            if (membership is not null)
+            {
+                MemberViewModel.MemberShipStartDate=membership.CreatedAt.ToShortDateString();
+                MemberViewModel.MemberShipEndDate=membership.EndDate.ToShortDateString();
+
+                var plan = _planRepositries.GetById(membership.PlanId);
+                MemberViewModel.PlanName = plan?.Name;
+
+            }
+            return MemberViewModel;
         }
     }
 }
