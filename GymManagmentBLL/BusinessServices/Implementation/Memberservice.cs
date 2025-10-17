@@ -1,7 +1,9 @@
 ﻿using GymManagmentBLL.BusinessServices.Interfaces.IMemberServices;
 using GymManagmentBLL.ViewModels;
+using GymManagmentBLL.ViewModels.MemberVM;
 using GymManagmentDAL.Entities;
 using GymManagmentDAL.Repositries.abstractions;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +28,7 @@ namespace GymManagmentBLL.BusinessServices.Implementation
         public bool CreateMember(CreateMemberViewModel createMember)
         {
             //Email not exist
-            var EmailExist = _memberRepositry.GetAll(X => X.Email == createMember.Email).Any();
-            if (EmailExist)
-                return false;
+
             #region first way
             //if (members.Any())
             //{
@@ -44,11 +44,14 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
 
             //phone not exist
-            var PhoneExist = _memberRepositry.GetAll(X => X.Phone == createMember.Phone).Any();
-            if (PhoneExist) return false;
 
-            //CreateMemberViewModel=>Member
-            var member = new Member
+            if (isEmailExist(createMember.Email) || isPhoneExist(createMember.Phone))
+            {
+                return false;
+            }
+
+                //CreateMemberViewModel=>Member
+                var member = new Member
             {
                 Name = createMember.Name,
                 Email = createMember.Email,
@@ -150,5 +153,68 @@ namespace GymManagmentBLL.BusinessServices.Implementation
             }
             return MemberViewModel;
         }
+
+        public MemberToUpdateViewModel? GetMemberToUpdate(int memberId)
+        {
+            var member = _memberRepositry.GetById(memberId);
+            if (member == null) return null;
+
+            return new MemberToUpdateViewModel
+            {
+                Name = member.Name,
+                Phone = member.Phone,
+                Email = member.Email,
+                Photo = member.photo,
+                BuildingNumber = member.Address.BuildingNumber,
+                City = member.Address.City,
+                Street = member.Address.Street,
+
+            };
+        }
+
+        public bool UpdateMember(int MemberId, MemberToUpdateViewModel memberToUpdate)
+        {
+            try
+            {
+               
+                if (isEmailExist(memberToUpdate.Email) || isPhoneExist(memberToUpdate.Phone))
+                {
+                    return false;
+                }
+                var member = _memberRepositry.GetById(MemberId);
+                if (member == null) return false;
+
+                member.Email = memberToUpdate.Email;
+                member.Phone = memberToUpdate.Phone;
+                member.Address.BuildingNumber = memberToUpdate.BuildingNumber;
+                member.Address.City = memberToUpdate.City;
+                member.Address.Street = memberToUpdate.Street;
+                member.UpdatedAt = DateTime.Now;
+
+                return _memberRepositry.Update(member) > 0;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+
+            }
+        
+        #region Helper Method
+        private bool isEmailExist(string Email)
+        {
+            return  _memberRepositry.GetAll(X => X.Email == Email).Any();
+
+        }
+        private bool isPhoneExist(string phone)
+        {
+            return  _memberRepositry.GetAll(X => X.Phone == phone).Any();
+
+        }
+
+        #endregion
+
     }
 }

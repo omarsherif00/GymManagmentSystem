@@ -14,6 +14,7 @@ namespace GymManagmentBLL.ViewModels
         [StringLength(50,MinimumLength =2,ErrorMessage ="name must be between 2 to 50")]
         [RegularExpression(@"^[a-zA-Z\s]+$",ErrorMessage ="Name Must contain letters and spaces only")]
         public string Name { get; set; } = null;
+        
         [Required(ErrorMessage = "email required")]
         [EmailAddress(ErrorMessage = "invalid Email Format")]
         [DataType(DataType.EmailAddress)]

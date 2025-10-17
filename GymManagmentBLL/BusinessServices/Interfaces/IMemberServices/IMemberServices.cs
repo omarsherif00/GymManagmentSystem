@@ -1,4 +1,5 @@
 ﻿using GymManagmentBLL.ViewModels;
+using GymManagmentBLL.ViewModels.MemberVM;
 using GymManagmentDAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,9 @@ namespace GymManagmentBLL.BusinessServices.Interfaces.IMemberServices
         bool CreateMember(CreateMemberViewModel createMember);
 
         MemberViewModel? GetMemberDetails(int Memberid);
-    
+
+        MemberToUpdateViewModel? GetMemberToUpdate(int memberId);
+
+        bool UpdateMember(int MemberId,MemberToUpdateViewModel memberToUpdate);
     }
 }
