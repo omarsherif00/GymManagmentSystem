@@ -26,10 +26,9 @@ namespace GymManagmentDAL.Repositries.Implementation
 
         public IEnumerable<Plan> GetAllPlans(Plan plan) => _dbContext.Plans.ToList();
 
-        public int Update(Plan plan)
+        public void Update(Plan plan)
         {
             _dbContext.Plans.Update(plan);
-            return _dbContext.SaveChanges();
         }
     }
 }

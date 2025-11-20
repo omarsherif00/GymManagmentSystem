@@ -10,7 +10,7 @@ namespace GymManagmentDAL.Repositries.abstractions
     public interface IPlanRepositries
     {
         IEnumerable<Plan> GetAllPlans(Plan plan);
-        int Update(Plan plan);
+        void Update(Plan plan);
         Plan? GetById(int id);
 
     }
