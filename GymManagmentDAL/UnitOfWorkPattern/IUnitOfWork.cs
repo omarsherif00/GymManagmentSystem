@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.UnitOfWorkPattern
 {
-    public interface IUnintOfWork
+    public interface IUnitOfWork
     {
        IGenericRepositry<TEntity> GetRepositry<TEntity>() where TEntity:BaseEntity,new();
 

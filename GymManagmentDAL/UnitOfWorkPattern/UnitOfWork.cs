@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.UnitOfWorkPattern
 {
-    public class UnitOfWork : IUnintOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly Dictionary<Type, object> _repositries=new();
         private readonly GymDbContext _dbContext;

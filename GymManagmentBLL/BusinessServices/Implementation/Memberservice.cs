@@ -15,9 +15,9 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 {
     internal class Memberservice : IMemberServices
     {
-        private readonly IUnintOfWork _unintOfWork;
+        private readonly IUnitOfWork _unintOfWork;
 
-        public Memberservice(IUnintOfWork unintOfWork)
+        public Memberservice(IUnitOfWork unintOfWork)
         {
            _unintOfWork = unintOfWork;
         }
