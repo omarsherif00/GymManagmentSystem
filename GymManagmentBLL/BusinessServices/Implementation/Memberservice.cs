@@ -1,4 +1,4 @@
-﻿using GymManagmentBLL.BusinessServices.Interfaces.IMemberServices;
+﻿using GymManagmentBLL.BusinessServices.Interfaces;
 using GymManagmentBLL.ViewModels;
 using GymManagmentBLL.ViewModels.MemberVM;
 using GymManagmentDAL.Entities;

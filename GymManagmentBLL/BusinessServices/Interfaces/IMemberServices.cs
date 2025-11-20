@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GymManagmentBLL.BusinessServices.Interfaces.IMemberServices
+namespace GymManagmentBLL.BusinessServices.Interfaces
 {
     internal interface IMemberServices
     {
