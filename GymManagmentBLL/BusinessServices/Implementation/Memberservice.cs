@@ -1,7 +1,10 @@
-﻿using GymManagmentBLL.BusinessServices.Interfaces.IMemberServices;
+﻿using GymManagmentBLL.BusinessServices.Interfaces;
 using GymManagmentBLL.ViewModels;
+using GymManagmentBLL.ViewModels.MemberVM;
 using GymManagmentDAL.Entities;
 using GymManagmentDAL.Repositries.abstractions;
+using GymManagmentDAL.UnitOfWorkPattern;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +15,17 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 {
     internal class Memberservice : IMemberServices
     {
-        private readonly IGenericRepositry<Member> _memberRepositry;
+        private readonly IUnitOfWork _unintOfWork;
 
-        public Memberservice(IGenericRepositry<Member> memberRepositry)
+        public Memberservice(IUnitOfWork unintOfWork)
         {
-            _memberRepositry = memberRepositry;
+           _unintOfWork = unintOfWork;
         }
 
         public bool CreateMember(CreateMemberViewModel createMember)
         {
             //Email not exist
-            var EmailExist = _memberRepositry.GetAll(X=>X.Email==createMember.Email).Any();
-            if(EmailExist)
-                return false;
+
             #region first way
             //if (members.Any())
             //{
@@ -40,11 +41,14 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
 
             //phone not exist
-            var PhoneExist=_memberRepositry.GetAll(X=>X.Phone==createMember.Phone).Any();
-            if (PhoneExist) return false;
 
-            //CreateMemberViewModel=>Member
-            var member = new Member
+            if (isEmailExist(createMember.Email) || isPhoneExist(createMember.Phone))
+            {
+                return false;
+            }
+
+                //CreateMemberViewModel=>Member
+                var member = new Member
             {
                 Name = createMember.Name,
                 Email = createMember.Email,
@@ -58,27 +62,27 @@ namespace GymManagmentBLL.BusinessServices.Implementation
                     Street = createMember.Street,
 
                 },
-                HealthRecord=new HealthRecord
+                HealthRecord = new HealthRecord
                 {
-                    height=createMember.HealthRecord.Height,
-                    weight=createMember.HealthRecord.Weight,
-                    Bloodtype=createMember.HealthRecord.BloodType,
-                    note=createMember.HealthRecord.note
+                    height = createMember.HealthRecord.Height,
+                    weight = createMember.HealthRecord.Weight,
+                    Bloodtype = createMember.HealthRecord.BloodType,
+                    note = createMember.HealthRecord.note
                 }
-                
+
 
             };
             //Create Member in database
-            return _memberRepositry.Add(member)>0;
+            _unintOfWork.GetRepositry<Member>().Add(member);
 
 
-
+            return _unintOfWork.SaveChanges()>0;
         }
 
         public IEnumerable<MemberViewModel> GetAllMembers()
         {
-            var members = _memberRepositry.GetAll();
-            if(members == null || !members.Any())
+            var members = _unintOfWork.GetRepositry<Member>().GetAll();
+            if (members == null || !members.Any())
                 return [];
 
 
@@ -102,16 +106,178 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
             var memberViewModel = members.Select(M => new MemberViewModel
             {
-                     Id = M.id,
-                     Name = M.Name,
-                     Phone = M.Phone,
-                     Photo = M.photo,
-                     Email = M.Email,
-                     Gender = M.Gender.ToString(),
+                Id = M.id,
+                Name = M.Name,
+                Phone = M.Phone,
+                Photo = M.photo,
+                Email = M.Email,
+                Gender = M.Gender.ToString(),
 
             });
             return memberViewModel;
 
         }
+
+        public MemberViewModel? GetMemberDetails(int memberid)
+        {
+            var member = _unintOfWork.GetRepositry<Member>().GetById(memberid);
+            if (member == null) return null;
+
+            var MemberViewModel = new MemberViewModel
+            {
+                Name = member.Name,
+                Phone = member.Phone,
+                Email = member.Email,
+                Gender = member.Gender.ToString(),
+                DateOfBirth = member.DateOfBirth.ToShortDateString(),
+                Address = $"{member.Address.BuildingNumber}-{member.Address.Street}-{member.Address.City}",
+                Photo = member.photo,
+                
+
+
+            };
+            //active membership
+            var membership=_unintOfWork.GetRepositry<MemberShip>().GetAll(X=>X.MemberId==memberid && X.Status=="Active").FirstOrDefault();
+
+            if (membership is not null)
+            {
+                MemberViewModel.MemberShipStartDate=membership.CreatedAt.ToShortDateString();
+                MemberViewModel.MemberShipEndDate=membership.EndDate.ToShortDateString();
+
+                var plan = _unintOfWork
+                    .GetRepositry<Plan>()
+                    .GetById(membership.PlanId);
+                MemberViewModel.PlanName = plan?.Name;
+
+            }
+            return MemberViewModel;
+        }
+
+        public HealthRecordViewModel? GetMemberHealthDetails(int memberId)
+        {
+            var memberHealthRecord = _unintOfWork.GetRepositry<HealthRecord>().GetById(memberId);
+            if (memberHealthRecord is null) return null;
+
+            return new HealthRecordViewModel
+            { 
+                  Weight = memberHealthRecord.weight,
+                  Height = memberHealthRecord.height,
+                  BloodType = memberHealthRecord.Bloodtype,
+                  note = memberHealthRecord.note,
+
+
+                };
+        }
+
+        public MemberToUpdateViewModel? GetMemberToUpdate(int memberId)
+        {
+            var member = _unintOfWork.GetRepositry<Member>().GetById(memberId);
+            if (member == null) return null;
+
+            return new MemberToUpdateViewModel
+            {
+                Name = member.Name,
+                Phone = member.Phone,
+                Email = member.Email,
+                Photo = member.photo,
+                BuildingNumber = member.Address.BuildingNumber,
+                City = member.Address.City,
+                Street = member.Address.Street,
+
+            };
+        }
+
+        public bool RemoveMember(int memberId)
+        {
+            try
+            {
+                var member = _unintOfWork
+                    .GetRepositry<Member>()
+                    .GetById(memberId);
+
+                if (member == null) return false;
+                var memberSessionIds = _unintOfWork
+                    .GetRepositry<MemberSession>()
+                    .GetAll(X => X.MemberId == memberId)
+                    .Select(X => X.SessionId);
+
+                var hasFutureSessions = _unintOfWork
+                    .GetRepositry<session>()
+                .GetAll(S => memberSessionIds.Contains(S.id) && S.StartDate > DateTime.Now).Any();
+
+                if (hasFutureSessions)
+                    return false;
+
+                var membershipRepo = _unintOfWork
+                    .GetRepositry<MemberShip>();
+                var memberShips =membershipRepo
+                    .GetAll(X => X.MemberId == memberId);
+
+                if (memberShips.Any())
+                {
+                    foreach (var memberShip in memberShips)
+                    {
+                        membershipRepo.Delete(memberShip);
+                    }
+
+                }
+
+                 _unintOfWork.GetRepositry<Member>().Delete(member);
+
+               return _unintOfWork.SaveChanges() > 0;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+        public bool UpdateMember(int MemberId, MemberToUpdateViewModel memberToUpdate)
+        {
+            try
+            {
+               
+                if (isEmailExist(memberToUpdate.Email) || isPhoneExist(memberToUpdate.Phone))
+                {
+                    return false;
+                }
+                var member = _unintOfWork.GetRepositry<Member>().GetById(MemberId);
+                if (member == null) return false;
+
+                member.Email = memberToUpdate.Email;
+                member.Phone = memberToUpdate.Phone;
+                member.Address.BuildingNumber = memberToUpdate.BuildingNumber;
+                member.Address.City = memberToUpdate.City;
+                member.Address.Street = memberToUpdate.Street;
+                member.UpdatedAt = DateTime.Now;
+
+                 _unintOfWork.GetRepositry<Member>().Update(member);
+
+                return _unintOfWork.SaveChanges()>0;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+
+            }
+        
+        #region Helper Method
+        private bool isEmailExist(string Email)
+        {
+            return  _unintOfWork.GetRepositry<Member>().GetAll(X => X.Email == Email).Any();
+
+        }
+        private bool isPhoneExist(string phone)
+        {
+            return _unintOfWork.GetRepositry<Member>().GetAll(X => X.Phone == phone).Any();
+
+        }
+
+        #endregion
+
     }
 }
