@@ -16,12 +16,17 @@ namespace GymManagmentBLL.BusinessServices.Implementation
     {
         private readonly IGenericRepositry<Member> _memberRepositry;
         private readonly IPlanRepositries _planRepositries;
+        private readonly IGenericRepositry<MemberSession> _memberSessionRepo;
+        private readonly IGenericRepositry<session> _sessionRepo;
         private readonly IGenericRepositry<MemberShip> _memberShipRepositry;
 
-        public Memberservice(IGenericRepositry<Member> memberRepositry, IGenericRepositry<MemberShip> memberShipRepositry,IPlanRepositries planRepositries)
+
+        public Memberservice(IGenericRepositry<Member> memberRepositry, IGenericRepositry<MemberShip> memberShipRepositry,IPlanRepositries planRepositries,IGenericRepositry<MemberSession> memberSessionRepo,IGenericRepositry<session> sessionRepo )
         {
             _memberRepositry = memberRepositry;
             _planRepositries = planRepositries;
+            _memberSessionRepo = memberSessionRepo;
+            _sessionRepo = sessionRepo;
             _memberShipRepositry = memberShipRepositry;
         }
 
@@ -170,6 +175,43 @@ namespace GymManagmentBLL.BusinessServices.Implementation
                 Street = member.Address.Street,
 
             };
+        }
+
+        public bool RemoveMember(int memberId)
+        {
+            try
+            {
+                var member = _memberRepositry.GetById(memberId);
+                if (member == null) return false;
+                var memberSessionIds = _memberSessionRepo
+                    .GetAll(X => X.MemberId == memberId)
+                    .Select(X => X.SessionId);
+
+                var hasFutureSessions = _sessionRepo
+                .GetAll(S => memberSessionIds.Contains(S.id) && S.StartDate > DateTime.Now).Any();
+
+                if (hasFutureSessions)
+                    return false;
+
+                var memberShips = _memberShipRepositry.GetAll(X => X.MemberId == memberId);
+
+                if (memberShips.Any())
+                {
+                    foreach (var memberShip in memberShips)
+                    {
+                        _memberShipRepositry.Delete(memberShip);
+                    }
+
+                }
+
+                return _memberRepositry.Delete(member) > 0;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
 
         public bool UpdateMember(int MemberId, MemberToUpdateViewModel memberToUpdate)

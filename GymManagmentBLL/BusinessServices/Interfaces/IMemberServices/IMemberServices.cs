@@ -19,5 +19,7 @@ namespace GymManagmentBLL.BusinessServices.Interfaces.IMemberServices
         MemberToUpdateViewModel? GetMemberToUpdate(int memberId);
 
         bool UpdateMember(int MemberId,MemberToUpdateViewModel memberToUpdate);
+
+        bool RemoveMember(int memberId);
     }
 }
