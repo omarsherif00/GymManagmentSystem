@@ -15,10 +15,15 @@ namespace GymManagmentDAL.UnitOfWorkPattern
         private readonly Dictionary<Type, object> _repositries=new();
         private readonly GymDbContext _dbContext;
 
-        public UnitOfWork(GymDbContext dbContext)
+        public UnitOfWork(GymDbContext dbContext, ISessionRepo sessionRepo)
         {
             _dbContext = dbContext;
+            SessionRepo = sessionRepo;
         }
+
+        public ISessionRepo SessionRepo { get; }
+
+       
         public IGenericRepositry<TEntity> GetRepositry<TEntity>() where TEntity : BaseEntity, new()
         {
             //Data structure [key-value]
