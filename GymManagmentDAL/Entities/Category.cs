@@ -10,6 +10,6 @@ namespace GymManagmentDAL.Entities
     {
         public string CategoryName { get; set; }
 
-        public ICollection<session> sessions { get; set; }
+        public ICollection<Session> sessions { get; set; }
     }
 }

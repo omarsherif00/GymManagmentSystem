@@ -10,7 +10,8 @@ namespace GymManagmentDAL.UnitOfWorkPattern
 {
     public interface IUnitOfWork
     {
-       IGenericRepositry<TEntity> GetRepositry<TEntity>() where TEntity:BaseEntity,new();
+        public ISessionRepo SessionRepo { get;}
+        IGenericRepositry<TEntity> GetRepositry<TEntity>() where TEntity:BaseEntity,new();
 
         int SaveChanges();
     }

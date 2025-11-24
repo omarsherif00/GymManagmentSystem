@@ -13,7 +13,7 @@ namespace GymManagmentDAL.Entities
         public Member Member { get; set; }
 
         public int SessionId { get; set; }
-        public session Session { get; set; }
+        public Session Session { get; set; }
 
         public bool IsAttended { get; set; }
     }
