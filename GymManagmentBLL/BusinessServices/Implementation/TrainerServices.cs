@@ -180,7 +180,7 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
         private bool HasFutureSession(int trainerId)
         {
-            return _unitOfWork.GetRepositry<session>()
+            return _unitOfWork.GetRepositry<Session>()
                 .GetAll(S=>S.TrainerId==trainerId&&S.StartDate>DateTime.Now)
                 .Any();
         }

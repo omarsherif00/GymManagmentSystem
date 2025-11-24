@@ -13,6 +13,6 @@ namespace GymManagmentDAL.Entities
 
         public speciality Speciality { get; set; }
 
-        public ICollection<session> Sessions { get; set; }
+        public ICollection<Session> Sessions { get; set; }
     }
 }

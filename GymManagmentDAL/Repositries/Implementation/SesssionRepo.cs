@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Repositries.Implementation
 {
-    public class SesssionRepo : GenericRepositry<session>, ISessionRepo
+    public class SesssionRepo : GenericRepositry<Session>, ISessionRepo
     {
         private readonly GymDbContext _dbContext;
 
@@ -18,12 +18,20 @@ namespace GymManagmentDAL.Repositries.Implementation
         {
          _dbContext = dbContext;
         }
-        public IEnumerable<session> GetAllWithCategoryAndTrainer()
+        public IEnumerable<Session> GetAllWithCategoryAndTrainer()
         {
 
             return _dbContext.Sessions.Include(x => x.Category)
                 .Include(x => x.Trainer)
                 .ToList();
+        }
+
+        public Session? GetByIdWithTrainerAndCategory(int sessionId)
+        {
+            return _dbContext.Sessions
+                .Include(x => x.Category)
+                .Include(x => x.Trainer)
+                .FirstOrDefault(x=>x.id==sessionId);
         }
 
         public int GetCountOfBookedSlots(int sessionId)

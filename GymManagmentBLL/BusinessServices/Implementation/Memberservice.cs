@@ -202,7 +202,7 @@ namespace GymManagmentBLL.BusinessServices.Implementation
                     .Select(X => X.SessionId);
 
                 var hasFutureSessions = _unintOfWork
-                    .GetRepositry<session>()
+                    .GetRepositry<Session>()
                 .GetAll(S => memberSessionIds.Contains(S.id) && S.StartDate > DateTime.Now).Any();
 
                 if (hasFutureSessions)

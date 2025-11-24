@@ -1,4 +1,6 @@
-﻿using GymManagmentBLL.ViewModels.SessionVM;
+﻿using GymManagmentBLL.ViewModels;
+using GymManagmentBLL.ViewModels.SessionVM;
+using GymManagmentDAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,8 @@ namespace GymManagmentBLL.BusinessServices.Interfaces
     internal interface ISessionService
     {
         IEnumerable<SessionViewModel> GetAlllSessions();
+        SessionViewModel? GetSessionDetails(int sessionId);
+
+        
     }
 }

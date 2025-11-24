@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Data.Configurations
 {
-    internal class SessionConfiguration : IEntityTypeConfiguration<session>
+    internal class SessionConfiguration : IEntityTypeConfiguration<Session>
     {
-        public void Configure(EntityTypeBuilder<session> builder)
+        public void Configure(EntityTypeBuilder<Session> builder)
         {
             builder.ToTable(Tb =>
             {

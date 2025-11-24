@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace GymManagmentDAL.Repositries.abstractions
 {
-    public interface ISessionRepo
+    public interface ISessionRepo:IGenericRepositry<Session>
     {
-        IEnumerable<session> GetAllWithCategoryAndTrainer();
+        IEnumerable<Session> GetAllWithCategoryAndTrainer();
         int GetCountOfBookedSlots(int sessionId);
+
+        Session? GetByIdWithTrainerAndCategory(int sessionId);
     }
 }
