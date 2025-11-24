@@ -1,4 +1,5 @@
 using GymManagmentDAL.Data.Contexts;
+using GymManagmentDAL.Data.SeedData;
 using GymManagmentDAL.Entities;
 using GymManagmentDAL.Repositries.abstractions;
 using GymManagmentDAL.Repositries.Implementation;
@@ -30,8 +31,24 @@ namespace GymManagmentPL
             builder.Services.AddScoped(typeof(IUnitOfWork),typeof(UnitOfWork));
            // builder.Services.AddScoped(typeof(IPlanRepositries), typeof(PlanRepositry));
 
+
+
             var app = builder.Build();
 
+
+            
+            using var scope=app.Services.CreateScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
+
+            var pendingMigration=dbContext.Database.GetPendingMigrations();
+          
+            
+            if(pendingMigration?.Any()??false)
+                dbContext.Database.Migrate();
+
+            GymDbContextSeeding.SeedData(dbContext);
+            
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
