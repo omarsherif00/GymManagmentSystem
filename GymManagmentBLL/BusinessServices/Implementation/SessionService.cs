@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Quic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -104,7 +105,55 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
             return MappedSession;
         }
+        public bool CreateSession(SessionViewModel CreateSession)
+        {
+            throw new NotImplementedException();
+        }
 
+        public UpdateSessionViewModel? GetSessionToUpdate(int sessionId)
+        {
+            var session = _unitOfWork.SessionRepo.GetById(sessionId);
+            if (!IsSessionAvailableForUpdate(session!))
+                return null;
+
+            return _mapper.Map<UpdateSessionViewModel>(session);
+
+
+
+        }
+
+        public bool UpdateSession(int sessionId, UpdateSessionViewModel UpdateSession)
+        {
+
+            try
+            {
+                var session = _unitOfWork.SessionRepo.GetById(sessionId);
+
+                if (!IsSessionAvailableForUpdate(session!))
+                    return false;
+
+                if (!isTrainerExist(UpdateSession.TrainerId))
+                    return false;
+                if (isTimeValid(UpdateSession.StartDate, UpdateSession.EndDate))
+                    return false;
+
+                _mapper.Map(UpdateSession, session);
+
+                _unitOfWork.SessionRepo.Update(session!);
+
+                session!.UpdatedAt = DateTime.Now;
+
+                return _unitOfWork.SaveChanges() > 0;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+
+
+        }
 
         private bool isTrainerExist(int TrainerId)
         {
@@ -117,6 +166,23 @@ namespace GymManagmentBLL.BusinessServices.Implementation
         private bool isTimeValid(DateTime startDate,DateTime EndDate)
         {
             return startDate<EndDate;
+        }
+
+       private bool IsSessionAvailableForUpdate(Session session)
+        {
+            if(session == null) return false;
+
+            if(session.EndDate<DateTime.Now)
+                return false;
+
+            if (session.StartDate < DateTime.Now)
+                return false;
+
+            var hasActiveBookings = _unitOfWork.SessionRepo.GetCountOfBookedSlots(session.id) > 0;
+
+            if (hasActiveBookings)
+                return false;
+            return true;
         }
     }
 }
