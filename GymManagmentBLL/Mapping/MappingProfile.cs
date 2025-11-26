@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymManagementSystemBLL.View_Models.SessionVm;
 using GymManagmentBLL.ViewModels.SessionVM;
 using GymManagmentDAL.Entities;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,8 @@ namespace GymManagmentBLL.Mapping
                 .ForMember(dest=>dest.CategoryName,options=>options.MapFrom(src=>src.Category.CategoryName))
                 .ForMember(dest=>dest.AvailableSlots,options=>options.Ignore());
 
+
+            CreateMap<CreateSessionViewModel, Session>();
         }
 
     }
