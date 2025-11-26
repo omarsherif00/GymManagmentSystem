@@ -1,3 +1,4 @@
+using GymManagmentBLL.BusinessServices.Interfaces;
 using GymManagmentBLL.Mapping;
 using GymManagmentDAL.Data.Contexts;
 using GymManagmentDAL.Data.SeedData;
@@ -32,6 +33,9 @@ namespace GymManagmentPL
             builder.Services.AddScoped(typeof(IUnitOfWork),typeof(UnitOfWork));
             // builder.Services.AddScoped(typeof(IPlanRepositries), typeof(PlanRepositry));
             builder.Services.AddScoped(typeof(ISessionRepo), typeof(SesssionRepo));
+           
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+            
             builder.Services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 
             var app = builder.Build();
@@ -68,6 +72,7 @@ namespace GymManagmentPL
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
 
             app.Run();
         }
