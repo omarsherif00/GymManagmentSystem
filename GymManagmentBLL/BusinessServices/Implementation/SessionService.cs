@@ -105,11 +105,8 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
             return MappedSession;
         }
-        public bool CreateSession(SessionViewModel CreateSession)
-        {
-            throw new NotImplementedException();
-        }
-
+  
+         
         public UpdateSessionViewModel? GetSessionToUpdate(int sessionId)
         {
             var session = _unitOfWork.SessionRepo.GetById(sessionId);
@@ -155,6 +152,28 @@ namespace GymManagmentBLL.BusinessServices.Implementation
 
         }
 
+
+        public bool DeleteSession(int sessionId)
+        {
+            try
+            {
+                var session = _unitOfWork.SessionRepo.GetById(sessionId);
+                if (!IsSessionAvailableForRemove(session!))
+                    return false;
+
+                _unitOfWork.SessionRepo.Delete(session!);
+
+                return _unitOfWork.SaveChanges() > 0;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+
         private bool isTrainerExist(int TrainerId)
         {
             return _unitOfWork.GetRepositry<Trainer>().GetById(TrainerId) is not null;
@@ -184,5 +203,24 @@ namespace GymManagmentBLL.BusinessServices.Implementation
                 return false;
             return true;
         }
+       private bool IsSessionAvailableForRemove(Session session)
+        {
+            if(session == null) return false;
+
+ 
+
+            if (session.StartDate < DateTime.Now&&session.EndDate>DateTime.Now)
+                return false;
+
+
+            if (session.StartDate > DateTime.Now) return false;
+
+            var hasActiveBookings = _unitOfWork.SessionRepo.GetCountOfBookedSlots(session.id) > 0;
+
+            if (hasActiveBookings)
+                return false;
+            return true;
+        }
+
     }
 }

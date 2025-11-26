@@ -15,10 +15,12 @@ namespace GymManagmentBLL.BusinessServices.Interfaces
         IEnumerable<SessionViewModel> GetAlllSessions();
         SessionViewModel? GetSessionDetails(int sessionId);
 
-        bool CreateSession(SessionViewModel CreateSession);
+        bool CreateSession(CreateSessionViewModel CreateSession);
     
     UpdateSessionViewModel? GetSessionToUpdate(int sessionId); 
 
         bool UpdateSession(int sessionId,UpdateSessionViewModel UpdateSession);
+
+        bool DeleteSession(int sessionId);
     }
 }
