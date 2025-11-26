@@ -1,4 +1,5 @@
-﻿using GymManagmentBLL.ViewModels;
+﻿using GymManagementSystemBLL.View_Models.SessionVm;
+using GymManagmentBLL.ViewModels;
 using GymManagmentBLL.ViewModels.SessionVM;
 using GymManagmentDAL.Entities;
 using System;
@@ -14,6 +15,12 @@ namespace GymManagmentBLL.BusinessServices.Interfaces
         IEnumerable<SessionViewModel> GetAlllSessions();
         SessionViewModel? GetSessionDetails(int sessionId);
 
-        
+        bool CreateSession(CreateSessionViewModel CreateSession);
+    
+    UpdateSessionViewModel? GetSessionToUpdate(int sessionId); 
+
+        bool UpdateSession(int sessionId,UpdateSessionViewModel UpdateSession);
+
+        bool DeleteSession(int sessionId);
     }
 }
